@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 export default class TwitchClip {
     constructor(data) {
         this.title = data.title;
