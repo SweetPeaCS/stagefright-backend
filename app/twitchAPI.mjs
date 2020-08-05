@@ -17,7 +17,7 @@ export async function getClip(id, authentication) {
 export async function getTopClips(channel, authentication, top=5) {
     const topClipEndpointURL = `https://api.twitch.tv/kraken/clips/top` +
         `?channel=${channel}` +
-        `&period=month` +
+        `&period=all` +
         `&trending=false` +
         `&limit=${top}`;
     const headers = {
@@ -48,7 +48,7 @@ export async function getVideo(id, authentication) {
 export async function getTopVods(channel, authentication, top=5) {
     const topVideoEndpointURL = `https://api.twitch.tv/kraken/videos/top` +
         `?channel=${channel}` +
-        `&period=month` +
+        `&period=all` +
         `&trending=false` +
         `&limit=${top}`;
     const headers = {

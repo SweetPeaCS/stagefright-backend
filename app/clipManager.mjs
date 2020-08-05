@@ -1,6 +1,7 @@
 // Libraries
 import { getTopClips, getVideo } from './twitchAPI.mjs';
 import TwitchClip from './api-access/TwitchClip.mjs';
+import TwitchVod from './api-access/TwitchVod.mjs';
 import ObjectsToCsv from 'objects-to-csv';
 
 export async function getClipData(channels, access) {
@@ -10,12 +11,14 @@ export async function getClipData(channels, access) {
     for(let channel of channels) {
         console.log(`INFO: Getting top clips for ${channel}`);
         let clips = await getTopClips(channel, access, 100);
-        console.log(`INFO: Found ${clips.length} items`);
+        console.log(`Found ${clips.length} clips`);
         resultClips = [...resultClips, ...clips];
     }
     
-    // resultClips = convertListofClips(resultClips);
-    await writeDataToDisk(resultClips, "clips");
+    resultClips = convertListofClipObjects(resultClips);
+    if(process.env.NODE_ENV === "development") {
+        await writeDataToDisk(resultClips, "clips");
+    }
     return resultClips;
 };
 
@@ -24,7 +27,9 @@ export async function getVodData(listOfClips, access) {
     let resultList = [];
 
     for(let clip of listOfClips) {
-        vodSet.add(clip.vod.id);
+        if(clip.vodId) {
+            vodSet.add(clip.vodId);
+        }
     }
 
     for(let id of vodSet) {
@@ -32,7 +37,10 @@ export async function getVodData(listOfClips, access) {
         resultList.push(vod);
     }
 
-    await writeDataToDisk(resultList, "vods");
+    resultList = convertListofVodObjects(resultList);
+    if(process.env.NODE_ENV === "development") {
+        await writeDataToDisk(resultList, "vods");
+    }
     return resultList;
 }
 
@@ -41,14 +49,23 @@ export async function getVodForClip(id, access) {
     return vod;
 }
 
-export function convertToClip(object) {
-    return new TwitchClip(clip);    
+export function convertListofClipObjects(list) {
+    let resultList = [];
+
+    for(let clip of list) {
+        let newClip = new TwitchClip(clip);
+        resultList.push(newClip);
+    }
+
+    return resultList;
 }
 
-export function convertListofClips(list) {
+export function convertListofVodObjects(list) {
     let resultList = [];
+
     for(let clip of list) {
-        resultList.push(convertToClip(clip));
+        let newVod = new TwitchVod(clip);
+        resultList.push(newVod);
     }
 
     return resultList;
