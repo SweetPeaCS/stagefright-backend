@@ -42,8 +42,8 @@ const vodSchema = new Schema({
     recordDate: { type: Date },
     thumbnails: { type: thumbnailSchema },
 }).set('validateBeforeSave', false);
-const Clips = mongoose.model("Clip", clipSchema);
-const Vods = mongoose.model("Vods", vodSchema);
+export const Clips = mongoose.model("Clip", clipSchema);
+export const Vods = mongoose.model("Vods", vodSchema);
 
 export async function startMongoDb() {
     let dbObject, user;
@@ -85,6 +85,8 @@ export async function updateMongoRecords(data) {
         console.error(error);
     }
 
-    console.log(`DB INFO: Clips Updated: ${clipUpdate.nUpserted}, modified ${clipUpdate.nModified}`);
-    console.log(`DB INFO: Vods Updated: ${vodUpdate.nUpserted}, modified ${vodUpdate.nModified} VODs processed`);
+    if(process.env.NODE_ENV === "development") {
+        console.log(`DB DEBUG: Clips Updated: ${clipUpdate.nUpserted}, modified ${clipUpdate.nModified}`);
+        console.log(`DB DEBUG: Vods Updated: ${vodUpdate.nUpserted}, modified ${vodUpdate.nModified}`);
+    }
 }

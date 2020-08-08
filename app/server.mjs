@@ -11,8 +11,8 @@ const { clientid, secret } = TwitchCredentials;
 const access = new TwitchApp(clientid, secret);
 
 export async function launch() {
-    startMongoDb();
-    startApiGateway();
+    await startMongoDb();
+    await startApiGateway();
     // startFrontEnd();
     await forceRefreshData();
 }
