@@ -1,5 +1,6 @@
 // Libraries
 import TwitchApp from './api-access/twitchApp.mjs';
+import { startApiGateway } from './gateway.mjs';
 import { getClipData, getVodData } from './clipManager.mjs';
 import { startMongoDb, stopMongoDb, updateMongoRecords } from './mongo.mjs';
 
@@ -11,10 +12,9 @@ const access = new TwitchApp(clientid, secret);
 
 export async function launch() {
     startMongoDb();
-    // startApiGateway();
-    await forceRefreshData();
+    startApiGateway();
     // startFrontEnd();
-    stopMongoDb();
+    await forceRefreshData();
 }
 
 export async function forceRefreshData() {

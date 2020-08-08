@@ -41,8 +41,9 @@ export async function getVideo(id, authentication) {
         }
     };
 
-    let response = axios.get(videoEndpointURL, headers)
-    return (await response).data;
+    let response = axios.get(videoEndpointURL, headers);
+    let videoData = (await response).data
+    return { "id": id, ...videoData};
 }
 
 export async function getTopVods(channel, authentication, top=5) {

@@ -4,9 +4,11 @@
   "description": "Analytics tool to obtain Twitch clip data",
   "main": "app/app.mjs",
   "dependencies": {
+    "@meanie/mongoose-upsert-many": "^2.1.0",
     "axios": "^0.19.2",
-    "objects-to-csv": "^1.3.6",
-    "mongoose": "^5.9.27"
+    "express": "^4.17.1",
+    "mongoose": "^5.9.27",
+    "objects-to-csv": "^1.3.6"
   },
   "devDependencies": {},
   "scripts": {

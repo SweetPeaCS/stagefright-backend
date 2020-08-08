@@ -1,28 +1,25 @@
 import env from '../config/environment.mjs';
 import mongoose from 'mongoose';
+import upsertMany from '@meanie/mongoose-upsert-many';
 
-
-export function startMongoDb() {
-    if(process.env.NODE_ENV === "production") {
-        mongoose.connect(`mongodb://${env.production.host}:${env.production.port}/${env.production.database}`, {useNewUrlParser: true});
-    } else {
-        mongoose.connect(`mongodb://${env.development.host}:${env.development.port}/${env.development.database}`, {useNewUrlParser: true});
-    }
-}
-
-export function stopMongoDb() {
-    mongoose.disconnect();
-}
-
+mongoose.set('useUnifiedTopology', true);
+mongoose.plugin(upsertMany);
 const Schema = mongoose.Schema;
+
+const upsertManyClipsConfig = {
+    matchFields: ["slug"]
+}
+const upsertManyVodsConfig = {
+    matchFields: ["vodId"]
+}
 const thumbnailSchema = new Schema({
     medium: { type: String },
     small: { type: String },
     tiny: { type: String },
-});
+}).set('validateBeforeSave', false);
 const clipSchema = new Schema({
-    title: { type: String, Required: "Clip needs a title" },
-    slug: { type: String, Required: "Clip needs URL slug"},
+    title: { type: String },
+    slug: { type: String, Required: true},
     broadcaster: { type: String },
     broadcasterDisplayName: { type: String },
     broadcasterLogo: { type: String },
@@ -31,37 +28,63 @@ const clipSchema = new Schema({
     game: { type: String },
     views: { type: Number },
     date: { type: Date },
-    // thumbnails: { type: thumbnailSchema },
+    thumbnails: { type: thumbnailSchema },
     vodId: { type: Number },
     vodUrl: { type: String },
     vodOffset: { type: Number },
-});
+}).set('validateBeforeSave', false);
 const vodSchema = new Schema({
-    title: { type: String, Required: "Vod needs a title" },
+    title: { type: String },
     vodId: { type: Number, Required: "Vod needs some Id" },
     length: { type: Number },
     game: { type: String },
     views: { type: Number },
     recordDate: { type: Date },
     thumbnails: { type: thumbnailSchema },
-});
+}).set('validateBeforeSave', false);
 const Clips = mongoose.model("Clip", clipSchema);
 const Vods = mongoose.model("Vods", vodSchema);
 
-export function connectMongoDb() {
+export async function startMongoDb() {
+    let dbObject, user;
 
-}
-
-export function mongoDbIsConnected() {
-
-}
-
-export function updateMongoRecords(data) {
-    if(data.vods) {
-        Clips.updateMany(data.vods);
+    if(process.env.NODE_ENV === "production") {
+        dbObject = env.production.database;
+        user = dbObject.mongodbUsers[0];
+    } else {
+        dbObject = env.development.database;
     }
 
-    if(data.clips) {
-        Vods.updateMany(data.clips);
+    console.log(`INFO: Attempting connection to database`);
+    console.log(`mongodb://${dbObject.host}:${dbObject.port}/${dbObject.db}`)
+    mongoose.connect(`mongodb://${(user ? `${user.username}:${user.password}@`: "")}${dbObject.host}:${dbObject.port}/${dbObject.db}`, {useNewUrlParser: true})
+        .then(mongooseInfo => {
+            console.log(`INFO: Connection to database established`);
+        })
+        .catch(error => console.error(error));
+}
+
+export function stopMongoDb() {
+    mongoose.disconnect();
+}
+
+export async function updateMongoRecords(data) {
+    const { vods, clips } = data;
+    let clipUpdate, vodUpdate;
+    console.log(`INFO: Database transfer queued`);
+
+    try {
+        clipUpdate = await Clips.upsertMany(clips, upsertManyClipsConfig);
+    } catch(error) {
+        console.error(error);
     }
+
+    try {
+        vodUpdate = await Vods.upsertMany(vods, upsertManyVodsConfig);
+    } catch(error) {
+        console.error(error);
+    }
+
+    console.log(`DB INFO: Clips Updated: ${clipUpdate.nUpserted}, modified ${clipUpdate.nModified}`);
+    console.log(`DB INFO: Vods Updated: ${vodUpdate.nUpserted}, modified ${vodUpdate.nModified} VODs processed`);
 }

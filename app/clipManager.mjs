@@ -9,10 +9,15 @@ export async function getClipData(channels, access) {
 
     // Work through channel list to get Top clips
     for(let channel of channels) {
-        console.log(`INFO: Getting top clips for ${channel}`);
-        let clips = await getTopClips(channel, access, 100);
-        console.log(`Found ${clips.length} clips`);
-        resultClips = [...resultClips, ...clips];
+        try {
+            let clips = await getTopClips(channel, access, 100);
+            console.log(`INFO: Found ${clips.length} clips for ${channel}`);
+            resultClips = [...resultClips, ...clips];
+        } catch(error) {
+            console.error(`ERR: HTTP ${error.response.status}`);
+            console.error(`ERR: Could not get clips for Channel ${channel}`);
+        }
+        
     }
     
     resultClips = convertListofClipObjects(resultClips);
@@ -32,9 +37,16 @@ export async function getVodData(listOfClips, access) {
         }
     }
 
+    console.log(`INFO: Looking for ${vodSet.size} VODs`)
+    console.log(`INFO: This may take a while...`)
+
     for(let id of vodSet) {
-        let vod = await getVodForClip(id, access)
-        resultList.push(vod);
+        try {
+            let vod = await getVodForClip(id, access)
+            resultList.push(vod);
+        } catch(error) {
+            console.error(`ERR: Problem getting VOD for ID ${id}`)
+        }
     }
 
     resultList = convertListofVodObjects(resultList);

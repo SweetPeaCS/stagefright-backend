@@ -10,7 +10,7 @@ export default class TwitchClip {
         this.game = data.game;
         this.views = data.views;
         this.date = data.created_at;
-        // this.thumbnails = data.thumbnails;
+        this.thumbnails = data.thumbnails;
 
         if(data.vod) {
             this.vodId = data.vod.id;
