@@ -1,18 +1,29 @@
 import env from '../config/environment.mjs';
 import express from 'express';
+import cors from 'cors';
 import { Clips, Vods } from './mongo.mjs'
 
 const gateway = express();
 const router = express.Router();
 
-router.get("/clips", async (req, res) => res.send(await Clips.find()));
+router.get("/clips", async (req, res) => {
+    const clips = await Clips.find()
+    res.send({
+        "clips": [...clips]
+    });
+});
 router.get("/clips/:slug", async (req, res) => {
     const clip = await Clips.findOne({ slug: req.params.slug })
     res.send(clip);
 });
 
 
-router.get("/vods", async (req, res) => res.send(await Vods.find()));
+router.get("/vods", async (req, res) => {
+    const vods = await Vods.find();
+    res.send({
+        "vods": [...vods]
+    });
+});
 router.get("/vods/:id", async (req, res) => {
     const vod = await Vods.findOne({ vodId: req.params.id })
     res.send(vod);
@@ -20,9 +31,12 @@ router.get("/vods/:id", async (req, res) => {
 
 router.get("/categories");
 
+// Router setup
+gateway.use(cors());
+gateway.use("/api", router);
+
 export function startApiGateway() {
     let gatewayVars;
-    gateway.use("/api", router);
 
     if(process.env.NODE_ENV === "production") {
         gatewayVars = env.production.api;

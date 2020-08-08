@@ -1,6 +1,7 @@
 export default class TwitchClip {
     constructor(data) {
         this.title = data.title;
+        this.id = data.slug;
         this.slug = data.slug;
         this.broadcaster = data.broadcaster.name;
         this.broadcasterDisplayName = data.broadcaster.displayname;

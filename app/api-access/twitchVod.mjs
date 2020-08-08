@@ -1,5 +1,6 @@
 export default class TwitchVod {
     constructor(data) {
+        this.id = data.id;
         this.vodId = data.id;
         this.title = data.title;
         this.game = data.game;
