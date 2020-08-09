@@ -18,6 +18,7 @@ const thumbnailSchema = new Schema({
     tiny: { type: String },
 }).set('validateBeforeSave', false);
 const clipSchema = new Schema({
+    id: { type: String, Required: true },
     title: { type: String },
     slug: { type: String, Required: true},
     broadcaster: { type: String },
@@ -34,6 +35,7 @@ const clipSchema = new Schema({
     vodOffset: { type: Number },
 }).set('validateBeforeSave', false);
 const vodSchema = new Schema({
+    id: { type: String, Required: true },
     title: { type: String },
     vodId: { type: Number, Required: "Vod needs some Id" },
     length: { type: Number },

@@ -14,7 +14,9 @@ router.get("/clips", async (req, res) => {
 });
 router.get("/clips/:slug", async (req, res) => {
     const clip = await Clips.findOne({ slug: req.params.slug })
-    res.send(clip);
+    res.send({
+        "clips": clip
+    });
 });
 
 
@@ -24,7 +26,7 @@ router.get("/vods", async (req, res) => {
         "vods": [...vods]
     });
 });
-router.get("/vods/:id", async (req, res) => {
+router.get("/vod/:id", async (req, res) => {
     const vod = await Vods.findOne({ vodId: req.params.id })
     res.send(vod);
 });
