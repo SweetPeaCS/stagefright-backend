@@ -27,7 +27,9 @@ router.get("/clips/:slug", async (req, res) => {
         });
     } else {
         const clip = await Clips.findOne({ slug: req.params.slug })
-        res.send(clip);
+        res.send({
+            "clips": clips
+        });
     }
 });
 router.get("/clips/:slug/vod", async (req, res) => {
