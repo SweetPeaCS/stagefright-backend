@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import upsertMany from '@meanie/mongoose-upsert-many';
 
 mongoose.set('useUnifiedTopology', true);
+mongoose.set('useFindAndModify', false);
 mongoose.plugin(upsertMany);
 const Schema = mongoose.Schema;
 
@@ -16,7 +17,12 @@ const thumbnailSchema = new Schema({
     medium: { type: String },
     small: { type: String },
     tiny: { type: String },
-}).set('validateBeforeSave', false);
+});
+const catSchema = new Schema({
+    id: { type: String, Required: true },
+    name: { type: String, Required: true },
+    description: { type: String }
+});
 const clipSchema = new Schema({
     id: { type: String, Required: true },
     title: { type: String },
@@ -33,7 +39,8 @@ const clipSchema = new Schema({
     vodId: { type: Number },
     vodUrl: { type: String },
     vodOffset: { type: Number },
-}).set('validateBeforeSave', false);
+    tags: [{ type: String }]
+});
 const vodSchema = new Schema({
     id: { type: String, Required: true },
     title: { type: String },
@@ -43,9 +50,13 @@ const vodSchema = new Schema({
     views: { type: Number },
     recordDate: { type: Date },
     thumbnails: { type: thumbnailSchema },
-}).set('validateBeforeSave', false);
+    tags: [{ type: String }]
+});
+
+
 export const Clips = mongoose.model("Clip", clipSchema);
 export const Vods = mongoose.model("Vods", vodSchema);
+export const Categories = mongoose.model("Categories", catSchema);
 
 export async function startMongoDb() {
     let dbObject, user;

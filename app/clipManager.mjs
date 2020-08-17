@@ -76,8 +76,13 @@ export function convertListofVodObjects(list) {
     let resultList = [];
 
     for(let clip of list) {
+        try {
         let newVod = new TwitchVod(clip);
         resultList.push(newVod);
+        } catch(error) {
+            console.error("Failed to generate Vod for:");
+            console.error(clip);
+        }
     }
 
     return resultList;

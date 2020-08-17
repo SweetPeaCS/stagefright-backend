@@ -7,9 +7,9 @@ export default class TwitchVod {
         this.views = data.views;
         this.date = data.created_at;
         this.thumbnails = {
-            small: data.thumbnails.small[0].url,
-            medium: data.thumbnails.medium[0].url,
-            large: data.thumbnails.large[0].url,
+            small: data.thumbnails.small[0].url || 0,
+            medium: data.thumbnails.medium[0].url || 0,
+            large: data.thumbnails.large[0].url || 0,
         } 
         this.length = data.length;
         this.recordDate = data.recorded_at;
